@@ -18,7 +18,7 @@ In alarmunit.py the acutal instances, thus the different sensors and the actions
 in a specified interval time.
 
 # File/Folder Structure 
-
+```
 ├── alarmunit/
 │   ├── docs/                                   
 │   │   ├── Alarmeinheit_alt.pdf                (old code for Griggs apparatus at ETH)
@@ -32,3 +32,4 @@ in a specified interval time.
 │   ├── alarmunit.py                            (acutal code, containing instance definitions and frequence of iteration)
 │   ├── buzzer_class.py                         (class: adapts passive buzzer syntax to micropython to provide compatibility with machine functions)
 │   ├── mcp_pin_class.py                        (class: adapts i2c syntax of MCP23017 device to micropython to provide compatibility with machine functions)
+```
