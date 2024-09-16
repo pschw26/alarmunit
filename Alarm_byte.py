@@ -45,18 +45,17 @@ class Alarm:
     @classmethod
     def check_all_ok(cls):
         b = utime.ticks_ms()
-        for action in cls.actions:
-            if action.pin_ok is not None: 
-                val = action.pin_out.value() # read value of action.pin_out
-                if val == action.norm_out: # actual value of action.pin_out is equal to action.norm_out
-                    action.pin_ok.on() # ok
-                elif val != action.norm_out: # actual value of action.pin_out is not equal to action.norm_out
-                    action.pin_ok.off() # not ok
-            if action.pin_all_ok is not None:
-                if cls.Action.all_ok != 0x0: # check for possible error yielded from action.set_output()
-                    action.pin_all_ok.off() # there is at least one error: not ok
-                else:
-                    action.pin_all_ok.on() # there is no error: ok
+        for action in cls.Action.ok_pins:
+            val = action.pin_out.value() # read value of action.pin_out
+            if val == action.norm_out: # actual value of action.pin_out is equal to action.norm_out
+                action.pin_ok.on() # ok
+            elif val != action.norm_out: # actual value of action.pin_out is not equal to action.norm_out
+                action.pin_ok.off() # not ok
+        for action in cls.Action.all_ok_pins:
+            if cls.Action.all_ok != 0x0: # check for possible error yielded from action.set_output()
+                action.pin_all_ok.off() # there is at least one error: not ok
+            else:
+                action.pin_all_ok.on() # there is no error: ok
         cls.Action.all_ok = cls.Action.all_ok & 0x1 # resets byte, AND operation yields 0x1 if persistent error, else 0x0
         e = utime.ticks_ms()
         print('timer check all ok',utime.ticks_diff(e, b), 'ms')
@@ -135,8 +134,9 @@ class Alarm:
                 else:
                     action.triggers |= (value << self.index)
             
-            
     class Action:
+        ok_pins = []
+        all_ok_pins = []
         all_ok = 0x0 # cls.all_ok is list for saving status of output pins
         index = 0
         def __init__(self, name, pin_out, norm_out, pin_ok=None, pin_all_ok=None, delay=None, persistent=False):
@@ -174,6 +174,10 @@ class Alarm:
             Alarm.actions.add(self)
             Alarm.Action.index += 1
             self.index = Alarm.Action.index
+            if self.pin_ok is not None:
+                Alarm.Action.ok_pins.append(self)
+            if self.pin_all_ok is not None:
+                Alarm.Action.all_ok_pins.append(self)
 
 
         def eval_state(self):

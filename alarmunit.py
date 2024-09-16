@@ -8,12 +8,16 @@ Created on Tue Jul  4 16:21:15 2023
 from time import time
 from machine import Pin, Timer, ADC, PWM
 from Alarm_byte import Alarm
+# from Alarm import Alarm
 from mcp_pin_class import mcp_pin
 from buzzer_class import buzzer
 
 ### BUG REPORT/QUESTIONS 12.09.24 ###
 # - test with analog sensor!
 # - with Alarm_byte 50 Hz are okay for current circuit
+# - Bottleneck-test with current circuit (16.09.24):
+#					- With Alarm-byte: ca. 12-23 ms
+#					- With Alarm:      ca. 16-26 ms
 
 ### INITIALIZE I2C BUS ###
 # creating bus-instance
@@ -100,7 +104,7 @@ def timer_callback(timer):
 timer = Timer(-1)  # Use the first available hardware timer (-1) on the microcontroller
 
 # Set the timer callback function
-timer.init(period=20, mode=Timer.PERIODIC, callback=timer_callback)
+timer.init(period=1000, mode=Timer.PERIODIC, callback=timer_callback)
 # The timer will fire every x seconds (x000 milliseconds) and call the 
 # timer_callback function.
 
