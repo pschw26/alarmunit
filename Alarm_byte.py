@@ -6,6 +6,7 @@ Created on Tue Aug 15 13:11:09 2023
 @author: pgross
 """
 from machine import Timer
+import utime 
 
 class Alarm:
     sensors = set()
@@ -15,28 +16,35 @@ class Alarm:
     
     @classmethod
     def check_sensors(cls):
+        b = utime.ticks_ms()
         for sensor in cls.sensors:
             sensor.check_sensor()
-
+        e = utime.ticks_ms()
+        print('timer check sensors',utime.ticks_diff(e, b), 'ms')
             
     @classmethod
     def reset_action_triggers(cls):
         '''Resets the non-permanent parts of all action trigger lists to 
         prepare a new iteration.'''
+        b = utime.ticks_ms()
         for action in cls.actions:
             action.triggers = action.triggers & 0x1
-
-
+        e = utime.ticks_ms()
+        print('timer reset action triggers',utime.ticks_diff(e, b), 'ms')
+        
     @classmethod
     def run_actions(cls):
+        b = utime.ticks_ms()
         for action in cls.actions:
             action.eval_state()
             action.prepare_output()  
             action.set_output()
-    
+        e = utime.ticks_ms()
+        print('timer run actions',utime.ticks_diff(e, b), 'ms')
     
     @classmethod
     def check_all_ok(cls):
+        b = utime.ticks_ms()
         for action in cls.actions:
             if action.pin_ok is not None: 
                 val = action.pin_out.value() # read value of action.pin_out
@@ -50,13 +58,17 @@ class Alarm:
                 else:
                     action.pin_all_ok.on() # there is no error: ok
         cls.Action.all_ok = cls.Action.all_ok & 0x1 # resets byte, AND operation yields 0x1 if persistent error, else 0x0
+        e = utime.ticks_ms()
+        print('timer check all ok',utime.ticks_diff(e, b), 'ms')
             
             
     @classmethod
     def admin_operation(cls):
+        b = utime.ticks_ms()
         for master in cls.masters:
             master.reset_or_ignore()
-        
+        e = utime.ticks_ms()
+        print('timer check master',utime.ticks_diff(e, b), 'ms')
         
     class Sensor:
         index = 0 # used to save the information: which sensors have which action

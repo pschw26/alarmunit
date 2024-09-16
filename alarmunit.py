@@ -92,7 +92,7 @@ def timer_callback(timer):
     A.run_actions()
     A.check_all_ok()
     # Sleep is NOT needed in this implementation!
-    print('time: ', time())
+#     print('time: ', time())
     
 
 ### MAIN LOOP ###
